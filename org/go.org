@@ -1,0 +1,6 @@
+# -*- coding:utf-8-*-
+#+TITLE: golang面试题目
+#+AUTHOR: liushangliang
+#+EMAIL: phenix3443+github@gmail.com
+
+* 协程间的通信方式？

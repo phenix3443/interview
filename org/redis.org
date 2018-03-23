@@ -1,0 +1,10 @@
+# -*- coding:utf-8-*-
+#+TITLE: redis常见问题
+#+AUTHOR: liushangliang
+#+EMAIL: phenix3443+github@gmail.com
+
+* 有哪几种数据类型？分别用于什么场景？
+
+* 如何实现redis的高可用？
+
+* 如何数据备份？

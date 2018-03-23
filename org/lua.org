@@ -1,0 +1,12 @@
+# -*- coding:utf-8-*-
+#+TITLE: Lua面试题目
+#+AUTHOR: liushangliang
+#+EMAIL: phenix3443+github@gmail.com
+
+* 作用域有哪几种？
+
+* ipairs和pairs区别
+
+* 元表的用途
+
+* 协程的用途
