@@ -1,0 +1,25 @@
+# -*- coding:utf-8-*-
+#+TITLE: 常考的手写代码
+#+AUTHOR: liushangliang
+#+EMAIL: phenix3443+github@gmail.com
+
+* 字符串
+** strcmp
+
+** strcopy
+
+** strcat
+
+* 链表
+
+** 求单链表中结点的个数
+** 将单链表反转
+** 查找单链表中的倒数第 K 个结点（k > 0）
+** 查找单链表的中间结点
+** 从尾到头打印单链表
+** 已知两个单链表 pHead1 和 pHead2 各自有序，把它们合并成一个链表依然有序
+** 判断一个单链表中是否有环
+** 判断两个单链表是否相交
+** 求两个单链表相交的第一个节点
+** 已知一个单链表中存在环，求进入环中的第一个节点
+** 给出一单链表头指针 pHead 和一节点指针 pToBeDeleted，O(1) 时间复杂度删除节点 pToBeDeleted
