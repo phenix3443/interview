@@ -2,3 +2,70 @@
 #+TITLE: mysql常见问题
 #+AUTHOR: liushangliang
 #+EMAIL: phenix3443+github@gmail.com
+
+* 数据库范式[fn:1]
+** 什么是范式（NF,normal form）
+   作为设计的标准范式，其最大的意义就是为了避免数据的冗余和插入、删除、更新的异常。
+   #+BEGIN_EXAMPLE
+school(stu-id,stu-name,major,dean-name,dean-telephone)
+   #+END_EXAMPLE
+   在学校这个表里面，学生的学号、姓名、专业、系主任以及系主任电话被放到了一起.当进行一些特定操作的时候，着实会给我们带来极大的困扰。
+   + 插入异常 [输入新信息的时候，系主任电话号码输错] : 无法确认系主任的真正号码。
+   + 删除异常 [某个系的学生全部退学了] : 该系对应的系主任名字和电话号码也随之丢失。
+   + 更新异常 [系主任进行变更 / 系主任换手机号] : 我们需要把系里所有学生的行都给更新一遍，显然开销过大。
+
+** 第一范式(1NF)
+   所有的属性均有原子性。举例：
+   #+BEGIN_EXAMPLE
+TaobaoPucharsedLog(sid, date, buyer, seller, goods,amount)
+   #+END_EXAMPLE
+   显然 “商品” 会有更多详细的属性，例如商品名称，商品价格，产地等等。“用户” 也有昵称，年龄，住址等，“商户” 也是如此。这些属性都是可以再分割的，所以并不符合 1NF 范式，需要将其完全拆至不可分割为止。
+
+   修改示范：
+   #+BEGIN_EXAMPLE
+TaobaoPucharsedLog(sid, date, buyer-id, buyer-name, buyer-age, seller, goods, amount)
+   #+END_EXAMPLE
+   [仅拆开了 buyer]意义：嗯.. 这个还是等我们讲完四个定理再来说吧，现在讲解比较困难。
+
+** 第二范式（2NF）
+   在1NF 的前提上，如果依赖于主键，则需要依赖于所有主键，不能存在依赖部分主键的情况。
+
+   对于上面那个例子：
+   #+BEGIN_EXAMPLE
+TaobaoPucharsedLog(sid, date, buyer-id, buyer-name, buyer-age, seller-id, seller-name, seller-age, goods-id, goods-name, amount)
+   #+END_EXAMPLE
+   可以看到里面有四个主键：sid, buyer-id, seller-id, goods-id。对于 seller-name 属性，它仅依赖于 seller-id，跟 buyer-id 之类的没有任何关系，所以它对于主键的依赖是 “部分依赖”，并不符合 2NF。简单点说，就是不要把不相关的东西放到一个表里面。
+
+   修改示范：拆解成以下四个
+   #+BEGIN_EXAMPLE
+TaobaoPucharsedLog(sid, buyer-id, seller-id, goods-id, amount)
+BuyerInformation(buyer-id, buyer-name, buyer-age)
+SellerInformation(seller-id, seller-name, seller-age)
+GoodsInformation(goods-id, goods-name)
+   #+END_EXAMPLE
+   意义：不相关的东西不要放在一起，用多个小表连接来代替大表，减少修改时候的负担。
+
+** 第三范式（3NF）
+   对于除了主键外的列，不存在某个列，它能决定其他列。
+
+
+   在满足 1NF 和 2NF 的前提上，一个数据库表中不包含已在其它表中已包含的非主关键字信息。
+
+   说人话：不得存在传递式依赖，比如对于一张数据库，里面的元素有 son, person, father, grand-father，依赖关系是 son -> person, person -> father, father -> grand-father，明显有一个链表式的传递，3NF 中禁止此类依赖的出现。修改示范：依赖关系修改为son -> personson -> fatherson -> grand-father或者是拆成三张表(其实就是并查集里面的路径压缩）意义：避免查询路径过长而导致询问时间过长或者更新异常。以上面的家族关系为例，如果我想查询某位同学曾曾曾曾曾…… 曾祖父是谁，按照非 3NF 的依赖，则需要进行多次查询，而对于满足 3NF 的依赖，只需要进行一次查询。效率大大提高。
+* 索引
+
+** 实现原理
+
+** 注意事项
+
+* 优化
+
+** 表结构优化
+
+** 查询语句优化
+
+** 索引优化
+
+* Footnotes
+
+[fn:1] https://www.zhihu.com/question/24696366/answer/46864498
