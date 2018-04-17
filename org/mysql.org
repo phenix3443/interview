@@ -1,5 +1,5 @@
 # -*- coding:utf-8-*-
-#+TITLE: mysql常见问题
+#+TITLE: MySQL常见问题
 #+AUTHOR: liushangliang
 #+EMAIL: phenix3443+github@gmail.com
 
@@ -12,13 +12,13 @@
 
    以每天的销售表来举例：
    #+BEGIN_EXAMPLE
-Order(id, product, buyer, amount, payed)
+   Order(id, product, buyer, amount, payed)
    #+END_EXAMPLE
    显然，不管是产品（product）还是买家（buyer）都会有更详细的属性，比如product会有商品名称，商品价格，产地等，buyer 也有昵称，年龄，住址等，这些属性都是可以再分割的，所以并不符合 1NF 范式，需要将其完全拆至不可分割为止。
 
    修改示范：
    #+BEGIN_EXAMPLE
-Order(id, product-id, product-name, buyer-id, buyer-name, amount, payed)
+   Order(id, product-id, product-name, buyer-id, buyer-name, amount, payed)
    #+END_EXAMPLE
 
    意义：减少表中的冗余数据。
@@ -28,15 +28,15 @@ Order(id, product-id, product-name, buyer-id, buyer-name, amount, payed)
 
    意思是：如果依赖于主键，则需要依赖于所有主键，不能存在依赖部分主键的情况。
 
-   对于上面那个例子，主键是（primer key）：（id, product-id, buyer-id）：
+   对于上面那个例子，主键（primer key）是：（id, product-id, buyer-id）：
 
    对于 product-name 属性，它仅依赖于 product-id，跟 id，buyer-id 没有任何关系，所以它对于主键的依赖是 “部分依赖”，并不符合 2NF。简单点说，就是不要把不相关的东西放到一个表里面。
 
    拆解成几个不同的表：
    #+BEGIN_EXAMPLE
-Order(id, product-id, buyer-id, amount, payed)
-ProductInformation(product-id, product-name)
-BuyerInformation(buyer-id, buyer-name)
+   Order(id, product-id, buyer-id, amount, payed)
+   ProductInformation(product-id, product-name)
+   BuyerInformation(buyer-id, buyer-name)
    #+END_EXAMPLE
 
    意义：不相关的东西不要放在一起，用多个小表连接来代替大表，减少修改时候的负担。
@@ -48,10 +48,9 @@ BuyerInformation(buyer-id, buyer-name)
 
    上面的例子中，最终支付金额（payed）依赖购买数量（amount），购买数量又依赖主键，形成类依赖传递。
 
-
    应该通过字段，解除依赖传递：
    #+BEGIN_EXAMPLE
-Order(id, product-id, buyer-id, amount, price)
+   Order(id, product-id, buyer-id, amount, price)
    #+END_EXAMPLE
 
    意义：避免查询路径过长而导致询问时间过长或者更新异常。上面的例子太简单，说明不了什么问题。
@@ -60,7 +59,8 @@ Order(id, product-id, buyer-id, amount, price)
 
 ** 概念
    索引是对数据库表中一个或多个列的值进行排序的数据结构，以协助快速查询、更新数据库表中数据。索引的实现通常使用 B_TREE 及其变种。索引加速了数据访问，因为存储引擎不会再去扫描整张表得到需要的数据；相反，它从根节点开始，根节点保存了子节点的指针，存储引擎会根据指针快速寻找数据。
-
+   #+CAPTION: 数据表索引示例
+   #+NAME: fig-1
    [[http://static.zybuluo.com/Rico123/z13w648etta3tb90di3btu5b/%E7%B4%A2%E5%BC%95.png]]
 
    上图显示了一种索引方式。左边是数据库中的数据表，有 col1 和 col2 两个字段，一共有 15 条记录；右边是以 col2 列为索引列的 B-Tree 索引，每个节点包含索引的键值和对应数据表地址的指针，这样就可以都过 B-Tree 在 O(logn) 的时间复杂度内获取相应的数据，这样明显地加快了检索的速度。
@@ -89,7 +89,7 @@ Order(id, product-id, buyer-id, amount, price)
     + 经常作表连接的字段。
     + 经常出现在 order by, group by, distinct 后面的字段。
 *** 创建索引时需要注意什么？
-    + 非空字段：应该指定列为 NOT NULL，除非你想存储 NULL。在 mysql 中，含有空值的列很难进行查询优化，因为它们使得索引、索引的统计信息以及比较运算更加复杂。你应该用 0、一个特殊的值或者一个空串代替空值；
+    + 非空字段：应该指定列为 NOT NULL，除非你想存储 NULL。在 MySQL 中，含有空值的列很难进行查询优化，因为它们使得索引、索引的统计信息以及比较运算更加复杂。你应该用 0、一个特殊的值或者一个空串代替空值；
     + 取值离散大的字段：（变量各个取值之间的差异程度）的列放到联合索引的前面，可以通过 count() 函数查看字段的差异值，返回值越大说明字段的唯一值越多字段的离散程度高；
     + 索引字段越小越好：数据库的数据存储以页为单位一页存储的数据越多一次 IO 操作获取的数据越大效率越高。
 
@@ -101,7 +101,7 @@ Order(id, product-id, buyer-id, amount, price)
    InnoDB 存储引擎的索引用B+Tree实现。
 
 *** 文件索引和数据库索引为什么使用 B+Tree, 而不是B-Tree或红黑树?
-   + 数据库系统巧妙利用了局部性原理与磁盘预读原理，将一个节点的大小设为等于一个页，这样每个节点只需要一次 I/O 就可以完全载入，而红黑树这种结构，高度明显要深的多，并且由于逻辑上很近的节点 (父子) 物理上可能很远，无法利用局部性。
+    + 数据库系统巧妙利用了局部性原理与磁盘预读原理，将一个节点的大小设为等于一个页，这样每个节点只需要一次 I/O 就可以完全载入，而红黑树这种结构，高度明显要深的多，并且由于逻辑上很近的节点 (父子) 物理上可能很远，无法利用局部性。
 
     + B+Tree 的磁盘读写代价更低：B+Tree 的内部结点并没有指向关键字具体信息的指针，因此其内部结点相对 B-Tree更小。如果把所有同一内部结点的关键字存放在同一盘块中，那么盘块所能容纳的关键字数量也越多。一次性读入内存中的需要查找的关键字也就越多，相对来说 IO 读写次数也就降低了；
 
@@ -130,36 +130,36 @@ Order(id, product-id, buyer-id, amount, price)
    + REPEATABLE READ：在一个事务开始后，其他事务对数据库的修改在本事务中不可见，直到本事务 commit 或 rollback。但是，其他事务的 insert/delete 操作对该事务是可见的，也就是说，该隔离级别并不能避免幻读问题。在一个事务中重复 select 的结果一样，除非本事务中 update 数据库。
    + SERIALIZABLE：最高级别的隔离，只允许事务串行执行。
 
-　　MySQL 默认的隔离级别是 REPEATABLE READ。
+   　　MySQL 默认的隔离级别是 REPEATABLE READ。
 
-** mysql 的事务支持
+** MySQL 的事务支持
    MySQL 的事务支持不是绑定在 MySQL 服务器本身，而是与存储引擎相关：
    + MyISAM：不支持事务，用于只读程序提高性能；
    + InnoDB：支持 ACID 事务、行级锁、并发；
    + Berkeley DB：支持事务。
 
 * 优化
-  实践中，MySQL 的优化主要涉及 SQL 语句及索引的优化、数据表结构的优化、系统配置的优化和硬件的优化四个方面，如下图所示：
-
-  [[http://static.zybuluo.com/Rico123/oib9kuqar0gw6v6gna1tdw44/Mysql%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96]]
+  实践中，MySQL 的优化主要涉及 SQL 语句及索引的优化、数据表结构的优化、系统配置的优化和硬件的优化四个方面。
 
 ** SQL 语句的优化
 
-　　SQL 语句的优化主要包括三个问题，即如何发现有问题的 SQL、如何分析 SQL 的执行计划以及如何优化 SQL，下面将逐一解释。
+   SQL 语句的优化主要包括三个问题，即如何发现有问题的 SQL、如何分析 SQL 的执行计划以及如何优化 SQL，下面将逐一解释。
 
 *** 怎么发现有问题的 SQL?
 
     通过 MySQL 慢查询日志对有效率问题的 SQL 进行监控。
 
     MySQL 的慢查询日志是 MySQL 提供的一种日志记录，它用来记录在 MySQL 中响应时间超过阀值的语句，具体指运行时间超过 long_query_time 值的 SQL，则会被记录到慢查询日志中。long_query_time 的默认值为 10，意思是运行 10s 以上的语句。慢查询日志的相关参数如下所示：
+    #+CAPTION: 慢查询参数
+    #+NAME: fig-3
+    [[http://static.zybuluo.com/Rico123/8z3mtyozm1bh1gluttrahdri/慢查询日志相关参数.png]]
 
-    [[http://static.zybuluo.com/Rico123/8z3mtyozm1bh1gluttrahdri/%E6%85%A2%E6%9F%A5%E8%AF%A2%E6%97%A5%E5%BF%97%E7%9B%B8%E5%85%B3%E5%8F%82%E6%95%B0.png]]
 
-　　通过 MySQL 的慢查询日志，我们可以查询出执行的次数多占用的时间长的 SQL，可以通过 pt_query_disgest(一种 mysql 慢日志分析工具) 分析 Rows examine(MySQL 执行器需要检查的行数) 项去找出 IO 大的 SQL 以及发现未命中索引的 SQL，对于这些 SQL，都是我们优化的对象。
+    通过 MySQL 的慢查询日志，我们可以查询出执行的次数多占用的时间长的 SQL，可以通过 pt_query_disgest(一种 MySQL 慢日志分析工具) 分析 Rows examine(MySQL 执行器需要检查的行数) 项去找出 IO 大的 SQL 以及发现未命中索引的 SQL，对于这些 SQL，都是我们优化的对象。
 
 *** 通过 explain 查询和分析 SQL 的执行计划
 
-　　使用 EXPLAIN 关键字可以知道 MySQL 是如何处理你的 SQL 语句的，以便分析查询语句或是表结构的性能瓶颈。通过 explain 命令可以得到表的读取顺序、数据读取操作的操作类型、哪些索引可以使用、哪些索引被实际使用、表之间的引用以及每张表有多少行被优化器查询等问题。当扩展列 extra 出现 Using filesort 和 Using temporay，则往往表示 SQL 需要优化了。
+    使用 EXPLAIN 关键字可以知道 MySQL 是如何处理你的 SQL 语句的，以便分析查询语句或是表结构的性能瓶颈。通过 explain 命令可以得到表的读取顺序、数据读取操作的操作类型、哪些索引可以使用、哪些索引被实际使用、表之间的引用以及每张表有多少行被优化器查询等问题。当扩展列 extra 出现 Using filesort 和 Using temporay，则往往表示 SQL 需要优化了。
 
 *** SQL 语句的优化
 
@@ -178,11 +178,11 @@ Order(id, product-id, buyer-id, amount, price)
 
 ** 数据库表结构的优化
 
-　　数据库表结构的优化包括选择合适数据类型、表的范式的优化、表的垂直拆分和表的水平拆分等手段。
+   数据库表结构的优化包括选择合适数据类型、表的范式的优化、表的垂直拆分和表的水平拆分等手段。
 
 *** 选择合适数据类型
     + 使用较小的数据类型解决问题；
-    + 使用简单的数据类型 (mysql 处理 int 要比 varchar 容易)；
+    + 使用简单的数据类型 (MySQL 处理 int 要比 varchar 容易)；
     + 尽可能的使用 not null 定义字段；
     + 尽量避免使用 text 类型，非用不可时最好考虑分表；
 
@@ -206,7 +206,6 @@ Order(id, product-id, buyer-id, amount, price)
     + 对 ID 进行 hash 运算，如果要拆分成 5 个表，mod(id,5) 取出 0~4 个值；
     + 针对不同的 hashID 将数据存入不同的表中；
 
-
     表的水平拆分会带来一些问题和挑战，包括跨分区表的数据查询、统计及后台报表的操作等问题，但也带来了一些切实的好处：
     + 表分割后可以降低在查询时需要读的数据和索引的页数，同时也降低了索引的层数，提高查询速度；
     + 表中的数据本来就有独立性，例如表中分别记录各个地区的数据或不同时期的数据，特别是有些数据常用，而另外一些数据不常用。
@@ -215,7 +214,7 @@ Order(id, product-id, buyer-id, amount, price)
 ** 系统配置的优化
 
    + 操作系统配置的优化：增加 TCP 支持的队列数
-   + mysql 配置文件优化：Innodb 缓存池设置 (innodb_buffer_pool_size，推荐总内存的 75%) 和缓存池的个数（innodb_buffer_pool_instances）。
+   + MySQL 配置文件优化：Innodb 缓存池设置 (innodb_buffer_pool_size，推荐总内存的 75%) 和缓存池的个数（innodb_buffer_pool_instances）。
 
 ** 硬件的优化
    + CPU：核心数多并且主频高的
@@ -236,7 +235,7 @@ Order(id, product-id, buyer-id, amount, price)
 
   游标是对查询出来的结果集作为一个单元来有效的处理。游标可以定在该单元中的特定行，从结果集的当前行检索一行或多行。可以对结果集当前行做修改。一般不使用游标，但是需要逐条处理数据的时候，游标显得十分重要。
 
-  在操作 mysql 的时候，我们知道 MySQL 检索操作返回一组称为结果集的行。这组返回的行都是与 SQL 语句相匹配的行（零行或多行）。使用简单的 SELECT 语句，例如，没有办法得到第一行、下一行或前 10 行，也不存在每次一行地处理所有行的简单方法（相对于成批地处理它们）。有时，需要在检索出来的行中前进或后退一行或多行。这就是使用游标的原因。游标（cursor）是一个存储在 MySQL 服务器上的数据库查询，它不是一条 SELECT 语句，而是被该语句检索出来的结果集。在存储了游标之后，应用程序可以根据需要滚动或浏览其中的数据。游标主要用于交互式应用，其中用户需要滚动屏幕上的数据，并对数据进行浏览或做出更改。
+  在操作 MySQL 的时候，我们知道 MySQL 检索操作返回一组称为结果集的行。这组返回的行都是与 SQL 语句相匹配的行（零行或多行）。使用简单的 SELECT 语句，例如，没有办法得到第一行、下一行或前 10 行，也不存在每次一行地处理所有行的简单方法（相对于成批地处理它们）。有时，需要在检索出来的行中前进或后退一行或多行。这就是使用游标的原因。游标（cursor）是一个存储在 MySQL 服务器上的数据库查询，它不是一条 SELECT 语句，而是被该语句检索出来的结果集。在存储了游标之后，应用程序可以根据需要滚动或浏览其中的数据。游标主要用于交互式应用，其中用户需要滚动屏幕上的数据，并对数据进行浏览或做出更改。
 
 * 什么是触发器？
 
@@ -244,7 +243,7 @@ Order(id, product-id, buyer-id, amount, price)
 
 * MySQL 存储引擎中的 MyISAM 和 InnoDB 区别详解
 
-  在 MySQL 5.5 之前，MyISAM 是 mysql 的默认数据库引擎，其由早期的 ISAM（Indexed Sequential Access Method：有索引的顺序访问方法）所改良。虽然 MyISAM 性能极佳，但却有一个显著的缺点： 不支持事务处理。不过，MySQL 也导入了另一种数据库引擎 InnoDB，以强化参考完整性与并发违规处理机制，后来就逐渐取代 MyISAM。
+  在 MySQL 5.5 之前，MyISAM 是 MySQL 的默认数据库引擎，其由早期的 ISAM（Indexed Sequential Access Method：有索引的顺序访问方法）所改良。虽然 MyISAM 性能极佳，但却有一个显著的缺点： 不支持事务处理。不过，MySQL 也导入了另一种数据库引擎 InnoDB，以强化参考完整性与并发违规处理机制，后来就逐渐取代 MyISAM。
 
   InnoDB 是 MySQL 的数据库引擎之一，其由 Innobase oy 公司所开发，2006 年五月由甲骨文公司并购。与传统的 ISAM、MyISAM 相比，InnoDB 的最大特色就是支持 ACID 兼容的事务功能，类似于 PostgreSQL。目前 InnoDB 采用双轨制授权，一是 GPL 授权，另一是专有软件授权。具体地，MyISAM 与 InnoDB 作为 MySQL 的两大存储引擎的差异主要包括：
 
@@ -252,7 +251,7 @@ Order(id, product-id, buyer-id, amount, price)
 
   + 存储空间：MyISAM 可被压缩，占据的存储空间较小，支持静态表、动态表、压缩表三种不同的存储格式。InnoDB 需要更多的内存和存储，它会在主内存中建立其专用的缓冲池用于高速缓冲数据和索引。
 
-  + 可移植性、备份及恢复：MyISAM 的数据是以文件的形式存储，所以在跨平台的数据转移中会很方便，同时在备份和恢复时也可单独针对某个表进行操作。InnoDB 免费的方案可以是拷贝数据文件、备份 binlog，或者用 mysqldump，在数据量达到几十 G 的时候就相对痛苦了。
+  + 可移植性、备份及恢复：MyISAM 的数据是以文件的形式存储，所以在跨平台的数据转移中会很方便，同时在备份和恢复时也可单独针对某个表进行操作。InnoDB 免费的方案可以是拷贝数据文件、备份 binlog，或者用 MySQLdump，在数据量达到几十 G 的时候就相对痛苦了。
 
   + 事务支持：MyISAM 强调的是性能，每次查询具有原子性，其执行数度比 InnoDB 类型更快，但是不提供事务支持。InnoDB 提供事务、外键等高级数据库功能，具有事务提交、回滚和崩溃修复能力。
 
