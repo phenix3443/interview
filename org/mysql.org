@@ -141,7 +141,7 @@
 * 优化
   实践中，MySQL 的优化主要涉及 SQL 语句及索引的优化、数据表结构的优化、系统配置的优化和硬件的优化四个方面。
 
-** SQL 语句的优化
+** SQL 语句的优化[fn:3]
 
    SQL 语句的优化主要包括三个问题，即如何发现有问题的 SQL、如何分析 SQL 的执行计划以及如何优化 SQL，下面将逐一解释。
 
@@ -276,3 +276,5 @@
 [fn:1] https://www.zhihu.com/question/24696366/answer/46864498
 
 [fn:2] https://blog.csdn.net/justloveyou_/article/details/78308460
+
+[fn:3] [[https://coolshell.cn/articles/1846.html][MYSQL 性能优化的最佳 20 + 条经验]]
