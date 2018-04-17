@@ -4,11 +4,7 @@
 #+EMAIL: phenix3443+github@gmail.com
 
 * 字符串
-** strcmp
 
-** strcopy
-
-** strcat
 
 * 链表
 

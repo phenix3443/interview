@@ -1,0 +1,33 @@
+# -*- coding:utf-8-*-
+#+TITLE: 字符串函数
+#+AUTHOR: liushangliang
+#+EMAIL: phenix3443+github@gmail.com
+
+* string class[fn:1]
+  #+BEGIN_HTML
+<script src="https://gist.github.com/phenix3443/997e228b8472b0db59e7c601cd1f2392.js"></script>
+  #+END_HTML
+  STL类使用了copy-on-write。[fn:2]
+* strcmp
+  #+BEGIN_HTML
+
+  #+END_HTML
+* strcopy
+  #+BEGIN_HTML
+
+  #+END_HTML
+* strcat
+  #+BEGIN_HTML
+
+  #+END_HTML
+* memcpy
+  #+BEGIN_HTML
+
+  #+END_HTML
+
+
+* Footnotes
+
+[fn:1] [[https://coolshell.cn/articles/10478.html][C++ 面试中 STRING 类的一种正确写法]]
+
+[fn:2] [[https://coolshell.cn/articles/12199.html][C++ STL STRING 的 COPY-ON-WRITE 技术]]
