@@ -1,0 +1,13 @@
+# -*- coding:utf-8-*-
+#+TITLE: 二分查找算法
+#+AUTHOR: liushangliang
+#+EMAIL: phenix3443+github@gmail.com
+
+* 标准二分查找算法[fn:1]
+  #+BEGIN_HTML
+<script src="https://gist.github.com/phenix3443/72eddfcea2e65a7f5f97a2bbf7947e8d.js"></script>
+  #+END_HTML
+
+* Footnotes
+
+[fn:1] [[https://blog.csdn.net/luckyxiaoqiang/article/details/8937978][二分查找，你真的掌握了么]]
